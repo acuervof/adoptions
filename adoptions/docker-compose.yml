@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  pgvector:
+    image: ankane/pgvector:latest
+    container_name: pgvector
+    environment:
+      POSTGRES_USER: adoptions
+      POSTGRES_PASSWORD: adoptions
+      POSTGRES_DB: adoptions
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+volumes:
+  pgvector_data:

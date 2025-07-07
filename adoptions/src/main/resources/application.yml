@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: adoptions
+  config:
+    import: optional:file:env.properties
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:postgresql://localhost:5433/adoptions
+    username: adoptions
+    password: adoptions
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+    embedding:
+      transformer:
+        onnx:
+          model-uri: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx
+        tokenizer:
+          uri: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/raw/main/tokenizer.json
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            sql:
+              init: DEBUG
+        jdbc: DEBUG
