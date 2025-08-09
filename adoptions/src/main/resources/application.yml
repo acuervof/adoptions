@@ -41,6 +41,7 @@ logging:
   level:
     org:
       springframework:
+        ai: DEBUG
         boot:
           autoconfigure:
             sql:

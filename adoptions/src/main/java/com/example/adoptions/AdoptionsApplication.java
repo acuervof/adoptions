@@ -67,6 +67,7 @@ class AdoptionsController {
     private final ChatClient ai;
 
     AdoptionsController(JdbcClient db,
+                        DogAdoptionScheduler scheduler,
 //                        McpSyncClient mcpSyncClient,
                         PromptChatMemoryAdvisor promptChatMemoryAdvisor,
                         ChatClient.Builder ai,
@@ -86,9 +87,12 @@ class AdoptionsController {
             });
         }
         var system = """
-                You are an AI powered assistant to help people adopt a dog from the adoption agency named Pooch Palace with locations in Rio de Janeiro, Mexico City, Seoul, Tokyo, Singapore, Paris, Mumbai, New Delhi, Barcelona, London, and San Francisco. Information about the dogs available will be presented below. If there is no information, then return a polite response suggesting we don't have any dogs available.
+                You are an AI powered assistant to help people adopt a dog from the adoption agency named Pooch Palace with locations in Rio de Janeiro,
+                Mexico City, Seoul, Tokyo, Singapore, Paris, Mumbai, New Delhi, Barcelona, London, and San Francisco. Information about the dogs available will
+                be presented below. If there is no information, then return a polite response suggesting we don't have any dogs available.
                 """;
         this.ai = ai
+                .defaultTools(scheduler)
 //                .defaultToolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClient))
                 .defaultAdvisors(promptChatMemoryAdvisor, new QuestionAnswerAdvisor(vectorStore))
                 .defaultSystem(system)
@@ -115,8 +119,7 @@ record Dog(@Id int id, String name, String owner, String description) {
 @Component
 class DogAdoptionScheduler {
 
-    @Tool(description = "schedule an appointment to pickup or adopt a " +
-            "dog from a Pooch Palace location")
+    @Tool(description = "schedule an appointment to pickup or adopt a dog from a Pooch Palace location")
     String schedule(int dogId, String dogName) {
         System.out.println("Scheduling adoption for dog " + dogName);
         return Instant
